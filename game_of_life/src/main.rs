@@ -8,8 +8,8 @@ use systems::set_grid;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_systems(Startup, (set_window,update_cells).chain())
-        .add_systems(Update, set_grid)
+        .add_systems(Startup, (set_window,set_grid).chain())
+        .add_systems(Update, update_cells)
         .run();
 }
 
