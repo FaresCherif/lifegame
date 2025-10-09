@@ -54,7 +54,7 @@ pub fn update_cells(
     }
 }
 
-pub fn set_grid(mut commands: Commands) {
+pub fn set_grid(commands: &mut Commands) {
 
     for y in 0..GRID_HEIGHT {
         for x in 0..GRID_WIDTH {
