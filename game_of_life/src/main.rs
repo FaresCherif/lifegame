@@ -3,14 +3,14 @@ mod systems;
 mod interface;
 
 use bevy::{prelude::*};
-use systems::update_cells;
-use systems::set_grid;
+use systems::{set_grid,update_cells,StepTimer,DEFAULT_SPEED};
 use interface::{set_window, button_system, reset_grid_system, ResetGridEvent};
 
 
 
 fn main() {
     App::new()
+        .insert_resource(StepTimer(Timer::from_seconds(DEFAULT_SPEED, TimerMode::Repeating)))
         .add_plugins(DefaultPlugins)
         .add_event::<ResetGridEvent>() // <- très important
         .add_systems(Startup, (set_window,setup).chain())
