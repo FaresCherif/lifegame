@@ -7,55 +7,93 @@ pub struct SetWindowButton;
 #[derive(Event)]
 pub struct ResetGridEvent;
 
-pub fn set_window(mut commands: Commands, asset_server: Res<AssetServer>){
-    // Crée une caméra 2D
-    commands.spawn(Camera2dBundle::default());
+pub fn set_window(mut commands: Commands, asset_server: Res<AssetServer>) {
+    // 🎮 Caméra pour la grille (z = 0)
+    commands.spawn(Camera2dBundle {
+        camera: Camera {
+            order: 0, // d'abord la grille
+            ..default()
+        },
+        ..default()
+    });
 
-    
-        // Conteneur principal (centré)
+    // 🖱️ Caméra pour l’interface (z = 100)
+    commands.spawn(Camera2dBundle {
+        camera: Camera {
+            order: 1, // puis l’UI par-dessus
+            ..default()
+        },
+        ..default()
+    });
+
+    // Conteneur global (UI)
     commands
         .spawn(NodeBundle {
             style: Style {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
-                flex_direction: FlexDirection::Column, // colonne verticale
-                justify_content: JustifyContent::FlexStart, // centré horizontalement
-                align_items: AlignItems::FlexStart,      // en haut verticalement
+                flex_direction: FlexDirection::Row,
                 ..default()
             },
             ..default()
         })
         .with_children(|parent| {
+            // Panneau de gauche
             parent
-                .spawn((
-                    ButtonBundle {
-                        style: Style {
-                            width: Val::Px(160.0),
-                            height: Val::Px(50.0),
-                            justify_content: JustifyContent::Center,
-                            align_items: AlignItems::Center,
-                            ..default()
-                        },
-                        background_color: Color::srgb(0.3, 0.6, 0.3).into(),
+                .spawn(NodeBundle {
+                    style: Style {
+                        width: Val::Percent(25.0),
+                        height: Val::Percent(100.0),
+                        flex_direction: FlexDirection::Column,
+                        justify_content: JustifyContent::FlexStart,
+                        align_items: AlignItems::Center,
+                        padding: UiRect::all(Val::Px(10.0)),
                         ..default()
                     },
-                    SetWindowButton,
-                ))
-                .with_children(|b| {
-                    b.spawn(TextBundle::from_section(
-                        "Set Window",
-                        TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                            font_size: 22.0,
-                            color: Color::WHITE,
+                    background_color: Color::srgb(0.1, 0.1, 0.1).into(),
+                    ..default()
+                })
+                .with_children(|ui| {
+                    ui.spawn((
+                        ButtonBundle {
+                            style: Style {
+                                width: Val::Px(160.0),
+                                height: Val::Px(50.0),
+                                justify_content: JustifyContent::Center,
+                                align_items: AlignItems::Center,
+                                margin: UiRect::all(Val::Px(10.0)),
+                                ..default()
+                            },
+                            background_color: Color::srgb(0.3, 0.6, 0.3).into(),
+                            ..default()
                         },
-                    ));
+                        SetWindowButton,
+                    ))
+                    .with_children(|b| {
+                        b.spawn(TextBundle::from_section(
+                            "Nouvelle Grille",
+                            TextStyle {
+                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                font_size: 22.0,
+                                color: Color::WHITE,
+                            },
+                        ));
+                    });
                 });
+
+            // Zone vide à droite (juste pour garder la structure flex)
+            parent.spawn(NodeBundle {
+                style: Style {
+                    width: Val::Percent(75.0),
+                    height: Val::Percent(100.0),
+                    ..default()
+                },
+                background_color: Color::NONE.into(),
+                ..default()
+            });
         });
-
-
-        
 }
+
 
 pub fn button_system(
     mut interaction_query: Query<
