@@ -1,5 +1,9 @@
 use bevy::prelude::*;
-use crate::cell::Cell; // pour accéder au composant
+use crate::cell::{
+    Cell,
+    MutationType,
+    random_mutation
+}; // pour accéder au composant
 use std::collections::HashMap;
 
 #[derive(Resource)]
@@ -62,8 +66,14 @@ pub fn update_cells(
     for ((x, y), next_state) in updates {
         for (mut cell, mut sprite) in query.iter_mut() {
             if cell.x == x && cell.y == y {
+
+                // mutation seulement si la cellule "renaît"
+                if !cell.alive && next_state {
+                    cell.mutation = random_mutation();
+                }
+
                 cell.alive = next_state;
-                sprite.color = cell_color(cell.alive); // couleur cohérente
+                sprite.color = cell_color(cell.alive,cell.mutation); // couleur cohérente
                 break;
             }
         }
@@ -75,30 +85,38 @@ pub fn set_grid(commands: &mut Commands) {
     for y in 0..GRID_HEIGHT {
         for x in 0..GRID_WIDTH {
             let alive = rand::random::<bool>();
+            let mutation = if alive { random_mutation() } else { MutationType::None };
+
+
             let pos_x = (x as f32 - GRID_WIDTH as f32 / 2.0) * CELL_SIZE;
             let pos_y = (y as f32 - GRID_HEIGHT as f32 / 2.0) * CELL_SIZE;
 
             commands
                 .spawn(SpriteBundle {
                     sprite: Sprite {
-                        color: cell_color(alive),
+                        color: cell_color(alive,mutation),
                         custom_size: Some(Vec2::splat(CELL_SIZE - 1.0)),
                         ..Default::default()
                     },
                     transform: Transform::from_xyz(pos_x, pos_y, 0.0),
                     ..Default::default()
                 })
-                .insert(Cell { alive, x, y });
+                .insert(Cell { alive,mutation, x, y });
         }
     }
 }
 
 
 
-fn cell_color(alive: bool) -> Color {
-    if alive {
-        Color::srgb(0.2, 0.5, 0.2) // vert doux pour vivant
-    } else {
-        Color::srgb(0.0, 0.0, 0.0) // noir pour mort
+fn cell_color(alive: bool,mutation: MutationType) -> Color {
+
+    if !alive {
+        return Color::BLACK;
+    }
+
+    match mutation {
+        MutationType::None => Color::srgb(0.2, 0.8, 0.2), // 🟩 vert
+        MutationType::Blue => Color::srgb(0.2, 0.4, 1.0), // 🔵 bleu
+        MutationType::Red => Color::srgb(1.0, 0.2, 0.2),  // 🔴 rouge
     }
 }
