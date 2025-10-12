@@ -3,12 +3,17 @@ use crate::cell::Cell; // pour accéder au composant
 use std::collections::HashMap;
 
 #[derive(Resource)]
-pub struct StepTimer(pub Timer);
+pub struct StepTimer{
+    pub timer: Timer,
+    pub speed: f32,
+}
 
 const GRID_WIDTH: usize = 20;
 const GRID_HEIGHT: usize = 20;
 const CELL_SIZE: f32 = 20.0;
 pub const DEFAULT_SPEED: f32 = 0.05;
+pub const MIN_SPEED: f32 = 1.0;
+pub const MAX_SPEED: f32 = 0.05;
 
 pub fn update_cells(
     time: Res<Time>,
@@ -16,7 +21,7 @@ pub fn update_cells(
     mut query: Query<(&mut Cell, &mut Sprite)>
 ) {
     // 🔹 On fait avancer le timer à chaque frame
-    if !timer.0.tick(time.delta()).just_finished() {
+    if !timer.timer.tick(time.delta()).just_finished() {
         return; // ⛔ On ne fait rien tant que le timer n’a pas fini
     }
 
