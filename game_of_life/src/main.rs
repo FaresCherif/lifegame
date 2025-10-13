@@ -1,6 +1,7 @@
 mod cell;
 mod systems;
 mod interface;
+mod visual_elements;
 
 use bevy::{prelude::*};
 use systems::{set_grid,update_cells,StepTimer,DEFAULT_SPEED};
