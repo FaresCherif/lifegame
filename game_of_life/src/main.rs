@@ -7,8 +7,6 @@ use bevy::{prelude::*};
 use systems::{set_grid,update_cells,StepTimer,DEFAULT_SPEED};
 use interface::{set_window,update_slider, button_system, reset_grid_system, ResetGridEvent};
 
-
-
 fn main() {
     App::new()
         .insert_resource(StepTimer{

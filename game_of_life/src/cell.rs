@@ -30,3 +30,14 @@ pub fn random_mutation() -> MutationType {
         MutationType::None
     }
 }
+
+impl Cell {
+
+    pub fn change_state(&self, alive_neighbors: usize) -> bool {
+        return if self.alive {
+            alive_neighbors == 2 || alive_neighbors == 3
+        } else {
+            alive_neighbors == 3
+        };
+    }
+}

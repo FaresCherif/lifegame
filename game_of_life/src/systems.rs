@@ -54,12 +54,8 @@ pub fn update_cells(
         }
 
         // Appliquer les règles classiques
-        let next_state = if cell.alive {
-            alive_neighbors == 2 || alive_neighbors == 3
-        } else {
-            alive_neighbors == 3
-        };
-        updates.push(((cell.x, cell.y), next_state));
+
+        updates.push(((cell.x, cell.y), cell.change_state(alive_neighbors)));
     }
 
     // 3️⃣ Appliquer les changements aux cellules et aux sprites
