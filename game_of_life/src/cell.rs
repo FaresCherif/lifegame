@@ -18,20 +18,21 @@ pub enum MutationType {
     Red,
 }
 
-/// Tire aléatoirement un type de mutation selon les probabilités
-pub fn random_mutation() -> MutationType {
-    
-    let r = random::<f32>();
-    if r < 0.1 {
-        MutationType::Blue
-    } else if r < 0.2 {
-        MutationType::Red
-    } else {
-        MutationType::None
-    }
-}
+
 
 impl Cell {
+
+    pub fn new(x: usize, y: usize) -> Self {
+        let mut cell = Self {
+            alive :rand::random::<bool>(),
+            mutation: MutationType::None,
+            x:x,
+            y:y
+        };
+        cell.random_mutation(); // <--- on appelle la méthode ici
+        cell
+        
+    }
 
     pub fn change_state(&self, alive_neighbors: usize) -> bool {
         return if self.alive {
@@ -39,5 +40,19 @@ impl Cell {
         } else {
             alive_neighbors == 3
         };
+    }
+
+
+    /// Tire aléatoirement un type de mutation selon les probabilités
+    pub fn random_mutation(&mut self) {
+        
+        let r = random::<f32>();
+        self.mutation = if r < 0.1 {
+            MutationType::Blue
+        } else if r < 0.2 {
+            MutationType::Red
+        } else {
+            MutationType::None
+        }
     }
 }

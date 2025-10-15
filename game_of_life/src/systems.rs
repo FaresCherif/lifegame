@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 use crate::cell::{
     Cell,
-    MutationType,
-    random_mutation
+    MutationType
 }; // pour accéder au composant
 use std::collections::HashMap;
 
@@ -65,7 +64,7 @@ pub fn update_cells(
 
                 // mutation seulement si la cellule "renaît"
                 if !cell.alive && next_state {
-                    cell.mutation = random_mutation();
+                    cell.random_mutation();
                 }
 
                 cell.alive = next_state;
@@ -80,8 +79,7 @@ pub fn set_grid(commands: &mut Commands) {
 
     for y in 0..GRID_HEIGHT {
         for x in 0..GRID_WIDTH {
-            let alive = rand::random::<bool>();
-            let mutation = if alive { random_mutation() } else { MutationType::None };
+            let cell = Cell::new(x,y);
 
 
             let pos_x = (x as f32 - GRID_WIDTH as f32 / 2.0) * CELL_SIZE;
@@ -90,14 +88,14 @@ pub fn set_grid(commands: &mut Commands) {
             commands
                 .spawn(SpriteBundle {
                     sprite: Sprite {
-                        color: cell_color(alive,mutation),
+                        color: cell_color(cell.alive,cell.mutation),
                         custom_size: Some(Vec2::splat(CELL_SIZE - 1.0)),
                         ..Default::default()
                     },
                     transform: Transform::from_xyz(pos_x, pos_y, 0.0),
                     ..Default::default()
                 })
-                .insert(Cell { alive,mutation, x, y });
+                .insert(cell);
         }
     }
 }
