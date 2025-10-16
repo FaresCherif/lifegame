@@ -31,11 +31,36 @@ impl Cell {
     }
 
     pub fn change_state(&self, alive_neighbors: usize) -> bool {
-        return if self.alive {
-            alive_neighbors == 2 || alive_neighbors == 3
-        } else {
-            alive_neighbors == 3
-        };
+        match self.mutation {
+            MutationType::None => {
+                // Règle classique (Conway)
+                if self.alive {
+                    alive_neighbors == 2 || alive_neighbors == 3
+                } else {
+                    alive_neighbors == 3
+                }
+            }
+
+            MutationType::Blue => {
+                // 🔵 Mutation "résistante"
+                // → survit plus facilement, même avec un peu plus ou moins de voisins
+                if self.alive {
+                    (2..=4).contains(&alive_neighbors)
+                } else {
+                    alive_neighbors == 3 || alive_neighbors == 4
+                }
+            }
+
+            MutationType::Red => {
+                // 🔴 Mutation "agressive"
+                // → se reproduit plus facilement, mais meurt plus souvent (instable)
+                if self.alive {
+                    alive_neighbors == 3 // doit avoir exactement 3 pour survivre
+                } else {
+                    alive_neighbors == 2 || alive_neighbors == 3 // peut renaître plus facilement
+                }
+            }
+        }
     }
 
     /// Tire aléatoirement un type de mutation selon les probabilités
