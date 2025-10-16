@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use crate::cell::{
-    Cell,
-    MutationType
+    Cell
 }; // pour accéder au composant
 use std::collections::HashMap;
 
@@ -68,7 +67,7 @@ pub fn update_cells(
                 }
 
                 cell.alive = next_state;
-                sprite.color = cell_color(cell.alive,cell.mutation); // couleur cohérente
+                sprite.color = cell.cell_color(); // couleur cohérente
                 break;
             }
         }
@@ -88,7 +87,7 @@ pub fn set_grid(commands: &mut Commands) {
             commands
                 .spawn(SpriteBundle {
                     sprite: Sprite {
-                        color: cell_color(cell.alive,cell.mutation),
+                        color: cell.cell_color(),
                         custom_size: Some(Vec2::splat(CELL_SIZE - 1.0)),
                         ..Default::default()
                     },
@@ -102,15 +101,3 @@ pub fn set_grid(commands: &mut Commands) {
 
 
 
-fn cell_color(alive: bool,mutation: MutationType) -> Color {
-
-    if !alive {
-        return Color::BLACK;
-    }
-
-    match mutation {
-        MutationType::None => Color::srgb(0.2, 0.8, 0.2), // 🟩 vert
-        MutationType::Blue => Color::srgb(0.2, 0.4, 1.0), // 🔵 bleu
-        MutationType::Red => Color::srgb(1.0, 0.2, 0.2),  // 🔴 rouge
-    }
-}
