@@ -1,7 +1,9 @@
 use crate::{
     cell,
     systems::{ StepTimer,MAX_SPEED, MIN_SPEED, set_grid},
-    visual_elements::panel::{spawn_left_panel,spawn_right_panel}
+    visual_elements::panel::{spawn_left_panel,spawn_right_panel},
+    mutation_setting::{MutationCheckbox,MutationSettings}
+    
 };
 use bevy::core_pipeline::core_2d::Camera2dBundle;
 use bevy::ecs::system::ParamSet;
@@ -163,6 +165,35 @@ pub fn update_slider(
                 // ✅ texte
                 if let Ok(mut text) = text_query.get_single_mut() {
                     text.sections[0].value = format!("{:.2} s/étape", new_speed);
+                }
+            }
+        }
+    }
+}
+
+
+pub fn mutation_checkbox_system(
+    mut interaction_query: Query<(&Interaction, &mut BackgroundColor, &MutationCheckbox), (Changed<Interaction>, With<Button>)>,
+    mut settings: ResMut<MutationSettings>,
+) {
+    for (interaction, mut color, checkbox) in &mut interaction_query {
+        if *interaction == Interaction::Pressed {
+            match checkbox {
+                MutationCheckbox::Blue => {
+                    settings.allow_blue = !settings.allow_blue;
+                    *color = if settings.allow_blue {
+                        Color::srgb(0.2, 0.2, 0.8).into()
+                    } else {
+                        Color::srgb(0.3, 0.3, 0.3).into()
+                    };
+                }
+                MutationCheckbox::Red => {
+                    settings.allow_red = !settings.allow_red;
+                    *color = if settings.allow_red {
+                        Color::srgb(0.8, 0.2, 0.2).into()
+                    } else {
+                        Color::srgb(0.3, 0.3, 0.3).into()
+                    };
                 }
             }
         }

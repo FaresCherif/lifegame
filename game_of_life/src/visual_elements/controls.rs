@@ -151,12 +151,12 @@ pub fn spawn_mutation_checkboxes(ui: &mut ChildBuilder, asset_server: &Res<Asset
         ..default()
     })
     .with_children(|col| {
-        spawn_checkbox(col, font.clone(), "Mutation Bleue", MutationCheckbox::Blue);
-        spawn_checkbox(col, font.clone(), "Mutation Rouge", MutationCheckbox::Red);
+        spawn_checkbox(col, font.clone(), "Mutation Bleue", MutationCheckbox::Blue,Color::srgb(0.2, 0.2, 0.8).into());
+        spawn_checkbox(col, font.clone(), "Mutation Rouge", MutationCheckbox::Red,Color::srgb(0.8, 0.2, 0.2).into());
     });
 }
 
-fn spawn_checkbox(parent: &mut ChildBuilder, font: Handle<Font>, label: &str, kind: MutationCheckbox) {
+fn spawn_checkbox(parent: &mut ChildBuilder, font: Handle<Font>, label: &str, kind: MutationCheckbox, bg_color: BackgroundColor) {
     parent
         .spawn(NodeBundle {
             style: Style {
@@ -177,7 +177,7 @@ fn spawn_checkbox(parent: &mut ChildBuilder, font: Handle<Font>, label: &str, ki
                         margin: UiRect::right(Val::Px(10.0)),
                         ..default()
                     },
-                    background_color: Color::srgb(0.2, 0.8, 0.2).into(),
+                    background_color: bg_color,
                     ..default()
                 },
                 kind,
