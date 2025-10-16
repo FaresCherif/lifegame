@@ -2,10 +2,12 @@ mod cell;
 mod systems;
 mod interface;
 mod visual_elements;
+mod settings;
 
 use bevy::{prelude::*};
 use systems::{set_grid,update_cells,StepTimer,DEFAULT_SPEED};
 use interface::{set_window,update_slider, button_system, reset_grid_system, ResetGridEvent};
+use settings::{MutationSettings};
 
 fn main() {
     App::new()
@@ -13,6 +15,7 @@ fn main() {
             timer : Timer::from_seconds(DEFAULT_SPEED, TimerMode::Repeating),
             speed: DEFAULT_SPEED,
         })
+        .insert_resource(MutationSettings::default())
         .add_plugins(DefaultPlugins)
         .add_event::<ResetGridEvent>() // <- très important
         .add_systems(Startup, (set_window,setup).chain())
