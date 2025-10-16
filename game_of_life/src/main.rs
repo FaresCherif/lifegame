@@ -2,12 +2,12 @@ mod cell;
 mod systems;
 mod interface;
 mod visual_elements;
-mod settings;
+mod mutation_setting;
 
 use bevy::{prelude::*};
 use systems::{set_grid,update_cells,StepTimer,DEFAULT_SPEED};
 use interface::{set_window,update_slider, button_system, reset_grid_system, ResetGridEvent};
-use settings::{MutationSettings};
+use mutation_setting::{MutationSettings};
 
 fn main() {
     App::new()

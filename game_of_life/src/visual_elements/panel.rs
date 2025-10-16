@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use crate::{
-    visual_elements::controls::{spawn_new_grid_button,spawn_speed_control}
+    visual_elements::controls::{spawn_new_grid_button,spawn_speed_control,spawn_mutation_checkboxes}
 };
 
 pub fn spawn_left_panel(parent: &mut ChildBuilder, asset_server: &Res<AssetServer>) {
@@ -21,6 +21,7 @@ pub fn spawn_left_panel(parent: &mut ChildBuilder, asset_server: &Res<AssetServe
         .with_children(|ui| {
             spawn_new_grid_button(ui, asset_server);
             spawn_speed_control(ui, asset_server);
+            spawn_mutation_checkboxes(ui,asset_server)
         });
 }
 
