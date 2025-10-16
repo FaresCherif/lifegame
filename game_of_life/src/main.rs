@@ -19,12 +19,13 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_event::<ResetGridEvent>() // <- très important
         .add_systems(Startup, (set_window,setup).chain())
+
         .add_systems(Update, (update_slider,update_cells,button_system,reset_grid_system,mutation_checkbox_system).chain())
         .run();
 }
 
-fn setup(mut commands: Commands) {
-    set_grid(&mut commands); // Appel de ta fonction utilitaire
+fn setup(mut commands: Commands,settings: Res<MutationSettings>) {
+    set_grid(&mut commands,&settings); // Appel de ta fonction utilitaire
 }
 
 

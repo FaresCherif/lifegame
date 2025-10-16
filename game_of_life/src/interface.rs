@@ -95,6 +95,7 @@ pub fn reset_grid_system(
     mut ev_reset: EventReader<ResetGridEvent>,
     mut commands: Commands,
     query: Query<Entity, With<cell::Cell>>,
+    settings: Res<MutationSettings>
 ) {
     for _ in ev_reset.read() {
         // Supprimer toutes les anciennes cellules
@@ -103,7 +104,7 @@ pub fn reset_grid_system(
         }
 
         // Recréer une nouvelle grille
-        set_grid(&mut commands);
+        set_grid(&mut commands,&settings);
     }
 }
 

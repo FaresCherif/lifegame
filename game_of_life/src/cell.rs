@@ -1,5 +1,6 @@
 use bevy::prelude::*; // nécessaire ici car ce fichier a son propre scope
 use rand::random;
+use crate::mutation_setting::MutationSettings;
 
 // Composant représentant une cellule
 #[derive(Component)]
@@ -19,14 +20,14 @@ pub enum MutationType {
 }
 
 impl Cell {
-    pub fn new(x: usize, y: usize) -> Self {
+    pub fn new(x: usize, y: usize,settings: &MutationSettings) -> Self {
         let mut cell = Self {
             alive: rand::random::<bool>(),
             mutation: MutationType::None,
             x: x,
             y: y,
         };
-        cell.random_mutation(); // <--- on appelle la méthode ici
+        cell.random_mutation(settings); // <--- on appelle la méthode ici
         cell
     }
 
@@ -64,11 +65,11 @@ impl Cell {
     }
 
     /// Tire aléatoirement un type de mutation selon les probabilités
-    pub fn random_mutation(&mut self) {
+    pub fn random_mutation(&mut self, settings: &MutationSettings) {
         let r = random::<f32>();
-        self.mutation = if r < 0.1 {
+        self.mutation = if settings.allow_blue && r < 0.1 {
             MutationType::Blue
-        } else if r < 0.2 {
+        } else if settings.allow_red && r < 0.2 {
             MutationType::Red
         } else {
             MutationType::None

@@ -1,6 +1,9 @@
 use bevy::prelude::*;
-use crate::cell::{
-    Cell
+use crate::{
+    cell::{
+        Cell
+    },
+    mutation_setting::MutationSettings
 }; // pour accéder au composant
 use std::collections::HashMap;
 
@@ -20,7 +23,8 @@ pub const MAX_SPEED: f32 = 0.05;
 pub fn update_cells(
     time: Res<Time>,
     mut timer: ResMut<StepTimer>,
-    mut query: Query<(&mut Cell, &mut Sprite)>
+    mut query: Query<(&mut Cell, &mut Sprite)>,
+    settings: Res<MutationSettings>
 ) {
     // 🔹 On fait avancer le timer à chaque frame
     if !timer.timer.tick(time.delta()).just_finished() {
@@ -63,7 +67,7 @@ pub fn update_cells(
 
                 // mutation seulement si la cellule "renaît"
                 if !cell.alive && next_state {
-                    cell.random_mutation();
+                    cell.random_mutation(&settings);
                 }
 
                 cell.alive = next_state;
@@ -74,11 +78,11 @@ pub fn update_cells(
     }
 }
 
-pub fn set_grid(commands: &mut Commands) {
+pub fn set_grid(commands: &mut Commands,settings: &Res<MutationSettings>) {
 
     for y in 0..GRID_HEIGHT {
         for x in 0..GRID_WIDTH {
-            let cell = Cell::new(x,y);
+            let cell = Cell::new(x,y,settings);
 
 
             let pos_x = (x as f32 - GRID_WIDTH as f32 / 2.0) * CELL_SIZE;
