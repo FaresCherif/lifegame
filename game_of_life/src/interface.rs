@@ -23,6 +23,9 @@ pub struct SliderHandle;
 #[derive(Component)]
 pub struct SpeedText;
 
+#[derive(Resource, Default)]
+pub struct LastCursorPos(pub Option<Vec2>);
+
 pub const BAR_WIDTH: f32 = 100.0;
 pub const HANDLE_WIDTH: f32 = 2.0;
 
@@ -112,50 +115,48 @@ pub fn update_slider(
     mut cursor: EventReader<CursorMoved>,
     buttons: Res<ButtonInput<MouseButton>>,
     mut param_set: ParamSet<(
-        Query<(&GlobalTransform, &Style), With<SpeedSlider>>,
+        Query<(&GlobalTransform, &Style, &Interaction), With<SpeedSlider>>,
         Query<(&mut Style, &mut BackgroundColor), With<SliderHandle>>,
     )>,
     mut text_query: Query<&mut Text, With<SpeedText>>,
     mut timer_res: ResMut<StepTimer>,
+    mut last_cursor: ResMut<LastCursorPos>,
 ) {
-    // 🧩 1️⃣ On lit d’abord les infos du slider
-    let (slider_x, slider_width) = {
+    // 🔹 1️⃣ Mémoriser la dernière position connue
+    for event in cursor.read() {
+        last_cursor.0 = Some(event.position);
+    }
+
+    // 🔹 2️⃣ Lire le slider
+    let (slider_x, slider_width, interaction) = {
         let slider_query = param_set.p0();
-        if let Ok((transform, style)) = slider_query.get_single() {
-            let width = if let Val::Px(w) = style.width {
-                w
-            } else {
-                BAR_WIDTH
-            };
-            (transform.translation().x, width)
+        if let Ok((transform, style, interaction)) = slider_query.get_single() {
+            let width = if let Val::Px(w) = style.width { w } else { BAR_WIDTH };
+            (transform.translation().x, width, *interaction)
         } else {
             return;
         }
     };
 
-    // 🧩 2️⃣ Puis on modifie le handle (dans une autre portée)
-    if let Ok((mut handle_style, mut handle_color)) = param_set.p1().get_single_mut() {
-        for event in cursor.read() {
-            if buttons.pressed(MouseButton::Left) {
-                let x = event
-                    .position
-                    .x
-                    .clamp(slider_x - slider_width / 2.0, slider_x + slider_width / 2.0);
+    // 🔹 3️⃣ Si on clique, même sans bouger, on agit avec la dernière position
+    if buttons.pressed(MouseButton::Left)
+        && (interaction == Interaction::Hovered || interaction == Interaction::Pressed)
+    {
+        if let Some(pos) = last_cursor.0 {
+            let x = pos.x.clamp(slider_x - slider_width / 2.0, slider_x + slider_width / 2.0);
 
-                // ✅ vitesse
-                let min_speed = MIN_SPEED;
-                let max_speed = MAX_SPEED;
+            let min_speed = MIN_SPEED;
+            let max_speed = MAX_SPEED;
+            let ratio = ((x - (slider_x - slider_width / 2.0)) / slider_width).clamp(0.0, 1.0);
 
-                let ratio = ((x - (slider_x - slider_width / 2.0)) / slider_width).clamp(0.0, 1.0);
-
-                // ✅ déplacer le handle
+            if let Ok((mut handle_style, mut handle_color)) = param_set.p1().get_single_mut() {
+                // 🟨 Position du handle
                 let mut pos = ratio * BAR_WIDTH - (HANDLE_WIDTH * 2.0);
-                pos = pos.clamp(0.0, BAR_WIDTH - ((HANDLE_WIDTH * 2.0)+2.0));
-
+                pos = pos.clamp(0.0, BAR_WIDTH - ((HANDLE_WIDTH * 2.0) + 2.0));
                 handle_style.left = Val::Percent(pos);
 
+                // 🟨 Calcul de la nouvelle vitesse
                 let new_speed = min_speed - ratio * (min_speed - max_speed);
-
                 timer_res.speed = new_speed;
                 timer_res
                     .timer
@@ -163,7 +164,7 @@ pub fn update_slider(
 
                 *handle_color = Color::srgb(1.0 - ratio, 1.0, 0.2).into();
 
-                // ✅ texte
+                // 🟨 Texte
                 if let Ok(mut text) = text_query.get_single_mut() {
                     text.sections[0].value = format!("{:.2} s/étape", new_speed);
                 }
@@ -171,6 +172,7 @@ pub fn update_slider(
         }
     }
 }
+
 
 
 pub fn mutation_checkbox_system(

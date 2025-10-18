@@ -6,7 +6,7 @@ mod mutation_setting;
 
 use bevy::{prelude::*};
 use systems::{set_grid,update_cells,StepTimer,DEFAULT_SPEED};
-use interface::{set_window,update_slider, button_system, reset_grid_system,mutation_checkbox_system, ResetGridEvent};
+use interface::{set_window,update_slider, button_system, reset_grid_system,mutation_checkbox_system, ResetGridEvent,LastCursorPos};
 use mutation_setting::{MutationSettings};
 
 fn main() {
@@ -15,6 +15,7 @@ fn main() {
             timer : Timer::from_seconds(DEFAULT_SPEED, TimerMode::Repeating),
             speed: DEFAULT_SPEED,
         })
+        .insert_resource(LastCursorPos::default())
         .insert_resource(MutationSettings::default())
         .add_plugins(DefaultPlugins)
         .add_event::<ResetGridEvent>() // <- très important

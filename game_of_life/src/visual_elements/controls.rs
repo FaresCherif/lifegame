@@ -94,6 +94,7 @@ fn spawn_speed_bar(parent: &mut ChildBuilder, ratio: f32) {
                 ..default()
             },
             SpeedSlider,
+            Interaction::default(),
         ))
         .with_children(|bar| {
             let handle_x = BAR_WIDTH - (HANDLE_WIDTH * 2.0 + 2.0);
